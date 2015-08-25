@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+<ModulePrefs title= "我的今日星运" 
+    title_url="http://astro.lady.qq.com/"
+    directory_title="今日星运"
+    description="查看个人的每日星运"
+    render_inline="optional"
+    author="Yang Zhou"
+    author_email="julianne.zhou@gmail.com"
+    author_affiliation="Google Inc."
+    author_location="Beijing, China"
+    screenshot="/ig/modules/horoscope.png"
+    thumbnail="/ig/modules/horoscope-thm.png"
+    height="280">
+</ModulePrefs>
+<UserPref name="astro" display_name="星座" datatype="enum" default_value="%B0%D7%D1%F2%D7%F9">
+  <EnumValue value="%B0%D7%D1%F2%D7%F9" display_value="白羊座 (3月21日～4月20日)" />
+  <EnumValue value="%BD%F0%C5%A3%D7%F9" display_value="金牛座 (4月21日～5月21日)" />
+  <EnumValue value="%CB%AB%D7%D3%D7%F9" display_value="双子座 (5月22日～6月21日)" />
+  <EnumValue value="%BE%DE%D0%B7%D7%F9" display_value="巨蟹座 (6月22日～7月22日)" />
+  <EnumValue value="%CA%A8%D7%D3%D7%F9" display_value="狮子座 (7月23日～8月23日)" />
+  <EnumValue value="%B4%A6%C5%AE%D7%F9" display_value="处女座 (8月24日～9月23日)" />
+  <EnumValue value="%CC%EC%B3%D3%D7%F9" display_value="天秤座 (9月24日～10月23日)" />
+  <EnumValue value="%CC%EC%D0%AB%D7%F9" display_value="天蝎座 (10月24日～11月22日)" />
+  <EnumValue value="%C9%E4%CA%D6%D7%F9" display_value="射手座 (11月23日～12月21日)" />
+  <EnumValue value="%C4%A6%F4%C9%D7%F9" display_value="魔羯座 (12月22日～1月20日)" />
+  <EnumValue value="%CB%AE%C6%BF%D7%F9" display_value="水瓶座 (1月21日～2月19日)" />
+  <EnumValue value="%CB%AB%D3%E3%D7%F9" display_value="双鱼座 (2月20日～3月20日)" />
+</UserPref>
+<Content type="html">
+<![CDATA[
+  <div id="content_div"></div>
+  <script type="text/javascript">
+
+  function DisplayHoroscope() {
+    var prefs = new _IG_Prefs(__MODULE_ID__);
+    var astro = prefs.getString("astro");
+    if (astro == null || astro == "") { astro = "%B0%D7%D1%F2%D7%F9"; }
+
+    var url = "http://appastro.qq.com/cgi-bin/astro_newluckday11?astro=" + astro + "&type=today";
+    _IG_FetchContent(url, function (response) {
+
+      // Start building HTML string that will be displayed in <div>.
+      // Set the style for the <div>.
+      var html = "<div style='padding: 5px;background-color: #C2E3F7;font-family:Arial, Helvetica;text-align:left;font-size:90%;color: #00639E;'>";
+      //Set css origin
+      html += "<link href='http://astro.qq.com/images/dingyue/css.css' rel='stylesheet' type='text/css' />";
+      
+      //Horoscope infomation is displayed in a table
+      //set the table format and head
+      html += "<table background='http://mat1.qq.com/astro/images/dingyue/dyc17.gif' width='370' border='0' cellspacing='0' cellpadding='0'> <tr>"
+      html += "<td width='370' height='30' align='left' class='bluedzi ctzi'><img src='http://mat1.qq.com/astro/images/dingyue/dyc21.gif' width='21' height='18' align='absmiddle'>";
+
+      //distill data from url and format data in our style.
+      //distill 星座运势
+      var beginPos = response.indexOf("星座运势");
+      var endPos = response.indexOf("每日运势");
+      endPos = response.indexOf("table",endPos) - 1;
+      html += response.substr(beginPos,endPos - beginPos);
+    
+      //set the table format for 每日运势
+      html += "<table width='370' border='0' cellspacing='2' cellpadding='2'>"
+      
+      //distill 每日运势 and format the display
+      beginPos = response.indexOf("tr",endPos) - 1; 
+      endPos = response.indexOf("爱情指数");
+      endPos = response.indexOf("td",endPos) + 3;
+      html += response.substr(beginPos,endPos - beginPos) ;
+      html += "</tr> <tr>"
+
+      beginPos = endPos;
+      endPos = response.indexOf("幸运色");
+      endPos = response.indexOf("td",endPos) + 3; 
+      html += response.substr(beginPos,endPos - beginPos) ;
+      html += "</tr> <tr>"
+
+      //distill 今日概述
+      beginPos = endPos;
+      endPos = response.indexOf("今日概述");
+      endPos = response.indexOf("tr",endPos);
+      endPos = response.indexOf("tr",endPos + 3);
+      endPos = response.indexOf("tr",endPos + 3) + 3;
+      html += response.substr(beginPos,endPos - beginPos) ;
+      html += "</table>"
+      html += "</div>";
+      //alert(html);
+      // Display HTML string in <div>
+      _gel('content_div').innerHTML = html;
+    });
+  }
+
+  _IG_RegisterOnloadHandler(DisplayHoroscope);
+  </script>
+
+]]>
+</Content>
+</Module>
+
+
+
